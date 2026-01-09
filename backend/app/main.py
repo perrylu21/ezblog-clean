@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -12,12 +13,21 @@ from .models import BlogPost
 
 app = FastAPI(title="ezblog API", version="0.1.0")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+# Configure CORS origins from environment variable or use defaults
+cors_origins_env = os.getenv("CORS_ORIGINS")
+if cors_origins_env:
+    # Split comma-separated origins from environment variable
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
+else:
+    # Default origins for local development
+    cors_origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-    ],
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
